@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 @RequestMapping("/admin")
 public class AdminsController {
 
-    private final UserService userService;
+    private UserService userService;
     private RoleService roleService;
 
     @Autowired
@@ -25,22 +26,24 @@ public class AdminsController {
         this.roleService = roleService;
     }
 
-    @GetMapping("/")
-    public String index(Model model) {
+    @GetMapping("")
+    public String index(Model model, Principal principal) {
+        model.addAttribute("loggedUser", userService.getUserByEmail(principal.getName()));
         model.addAttribute("users", userService.getAllUsers());
 
         return "index";
     }
 
-    @GetMapping("/{id}")
-    public String show(@PathVariable("id") long id, Model model) {
-        model.addAttribute("user", userService.getUserById(id));
+    @GetMapping("/user")
+    public String showUser(Model model, Principal principal) {
+        model.addAttribute("user", userService.getUserByEmail(principal.getName()));
 
-        return "show";
+        return "show_admin";
     }
 
     @GetMapping("/new")
-    public String addUser(Model model) {
+    public String addUser(Model model, Principal principal) {
+        model.addAttribute("loggedUser", userService.getUserByEmail(principal.getName()));
         model.addAttribute("user", new User());
         model.addAttribute("roles", roleService.getAllRoles());
 
@@ -59,15 +62,6 @@ public class AdminsController {
         userService.addUser(user);
 
         return "redirect:/admin/";
-    }
-
-    @GetMapping("/{id}/edit")
-    public String editUser(Model model, @PathVariable("id") long id) {
-        User user = userService.getUserById(id);
-        user.setPassword("");
-        model.addAttribute("user", user);
-
-        return "edit";
     }
 
     @PatchMapping("/{id}")
@@ -90,5 +84,6 @@ public class AdminsController {
         userService.removeUser(id);
 
         return "redirect:/admin/";
+
     }
 }

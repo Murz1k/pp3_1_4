@@ -1,8 +1,6 @@
 package com.example.pp3_1_1.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,7 +10,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -30,6 +29,9 @@ public class User implements UserDetails {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "age")
+    private String age;
+
     @Column(name = "email")
     private String email;
 
@@ -45,10 +47,14 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
     @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();
     }
-
 
     @Override
     public boolean isAccountNonExpired() {
@@ -75,6 +81,13 @@ public class User implements UserDetails {
         return Objects.hash(id, name, lastName, email, username, password);
     }
 
+    public String getFormattedRoles(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Role role : roles){
+            stringBuilder.append(role).append(" ");
+        }
+        return stringBuilder.toString();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -20,8 +20,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Lazy
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder
-    ) {
+    public UserServiceImpl(UserRepository userRepository,
+                           BCryptPasswordEncoder bCryptPasswordEncoder) {
+
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void updateUser(long id, User user) {
-        if (user.getPassword() != "") {
+        if (user.getPassword() != null) {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         } else {
             user.setPassword(userRepository.getById(id).getPassword());
@@ -45,7 +46,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void removeUser(long id) {
         userRepository.deleteById(id);
-
     }
 
     @Override
@@ -54,12 +54,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserByUsername(username);
-
+        return userRepository.findUserByEmail(username);
     }
 }

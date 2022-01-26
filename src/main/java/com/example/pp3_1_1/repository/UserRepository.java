@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {  //методы можно добавлять и в репозиторий
-    User findUserByUsername(String username);   // все условия прописываем прямо в имени метода
+    User findUserByEmail(String email);   // все условия прописываем прямо в имени метода
 }

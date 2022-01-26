@@ -23,9 +23,9 @@ public class UsersController {
 
     @GetMapping
     public String login(Principal principal, Model model) {
-        User user = userRepository.findUserByUsername(principal.getName());
+        User user = userRepository.findUserByEmail(principal.getName());
         model.addAttribute("user", user);
 
-        return "/show";
+        return "show_user";
     }
 }
