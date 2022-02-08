@@ -1,31 +1,39 @@
 package com.example.pp3_1_1.controller;
 
-import com.example.pp3_1_1.model.User;
-import com.example.pp3_1_1.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.security.Principal;
+import com.example.pp3_1_1.model.User;
+import com.example.pp3_1_1.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @Controller
-@RequestMapping("/user")
 public class UsersController {
 
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    public void setUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UsersController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping
-    public String login(Principal principal, Model model) {
-        User user = userRepository.findUserByEmail(principal.getName());
-        model.addAttribute("user", user);
+    @GetMapping("/user")
+    public String showUser() {
 
-        return "show_user";
+        return "user";
     }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> getAuthorizedUser() {
+        UserDetails userDetails =
+                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        return ResponseEntity.ok().body(user);
+    }
+
 }

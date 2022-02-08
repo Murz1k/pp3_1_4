@@ -1,6 +1,10 @@
 package com.example.pp3_1_1.model;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,6 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "users")
 public class User implements UserDetails {
 
@@ -35,25 +40,23 @@ public class User implements UserDetails {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "username")
-    private String username;
-
     @Column(name = "password")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
+    private Set<Role> roles = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override
@@ -76,25 +79,29 @@ public class User implements UserDetails {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, lastName, email, username, password);
+    public String getFormattedRoles() {
+        StringBuilder sb = new StringBuilder();
+        for (Role role : roles) {
+            sb.append(role).append(" ");
+        }
+        return sb.toString();
     }
 
-    public String getFormattedRoles(){
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Role role : roles){
-            stringBuilder.append(role).append(" ");
-        }
-        return stringBuilder.toString();
-    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return Objects.equals(id, user.id) && Objects.equals(name, user.name)
-                && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email)
-                && Objects.equals(username, user.username) && Objects.equals(password, user.password);
+                && Objects.equals(lastName, user.lastName) && Objects.equals(age, user.age)
+                && Objects.equals(email, user.email) && Objects.equals(password, user.password);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, lastName, age, email, password);
+    }
+
 }
+
+
